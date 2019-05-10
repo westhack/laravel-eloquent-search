@@ -37,15 +37,7 @@
     "autoload-dev": {
     },
     "config": {
-        "preferred-install": "dist"
+        "sort-packages": true
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "extra": {
-        "laravel": {
-            "providers": [
-                "EloquentSearch\\ServiceProvider"
-            ]
-        }
-    }
+    "minimum-stability": "stable"
 }
