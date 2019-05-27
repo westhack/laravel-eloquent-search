@@ -58,9 +58,20 @@ trait SearchTrait
     public function scopeSearch($query, $params)
     {
         if (is_array($params)) {
-            foreach ($params as $key => $param) {
-                if (! array_has($param, ['column', 'operator', 'values'])) {
-                    continue;
+            foreach ($params as $key => $_param) {
+                $param = [];
+                if (is_array($_param)) {
+                    $param['column']   = array_get($_param, 'column', $key);
+                    $param['operator'] = array_get($_param, 'operator', '=');
+                    $param['values']   = array_get($_param, 'values', null);
+
+                } else {
+                    if ($_param == null) {
+                        continue;
+                    }
+                    $param['column']   = $key;
+                    $param['operator'] = '=';
+                    $param['values']   = $_param;
                 }
 
                 if ($param['values'] == null) {
