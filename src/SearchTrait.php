@@ -63,7 +63,7 @@ trait SearchTrait
                 if (is_array($_param)) {
                     $param['column']   = array_get($_param, 'column', $key);
                     $param['operator'] = array_get($_param, 'operator', '=');
-                    $param['values']   = array_get($_param, 'values', null);
+                    $param['value']    = array_get($_param, 'value', null);
 
                 } else {
                     if ($_param == null) {
@@ -71,19 +71,19 @@ trait SearchTrait
                     }
                     $param['column']   = $key;
                     $param['operator'] = '=';
-                    $param['values']   = $_param;
+                    $param['value']    = $_param;
                 }
 
-                if ($param['values'] == null) {
+                if ($param['value'] == null) {
                     continue;
                 }
 
                 switch (strtolower($param['operator'])) {
                     case 'between':
-                        $query->whereBetween($param['column'], $param['values']);
+                        $query->whereBetween($param['column'], $param['value']);
                         break;
                     case 'not between':
-                        $query->whereNotBetween($param['column'], $param['values']);
+                        $query->whereNotBetween($param['column'], $param['value']);
                         break;
                     case 'is null':
                         $query->whereNull($param['column']);
@@ -92,19 +92,19 @@ trait SearchTrait
                         $query->whereNotNull($param['column']);
                         break;
                     case 'like all':
-                        $query->whereLike($param['column'], $param['values']);
+                        $query->whereLike($param['column'], $param['value']);
                         break;
                     case 'begin with':
-                        $query->whereBeginsWith($param['column'], $param['values']);
+                        $query->whereBeginsWith($param['column'], $param['value']);
                         break;
                     case 'end with':
-                        $query->whereEndsWith($param['column'], $param['values']);
+                        $query->whereEndsWith($param['column'], $param['value']);
                         break;
                     case 'in':
-                        $query->whereIn($param['column'], $param['values']);
+                        $query->whereIn($param['column'], $param['value']);
                         break;
                     default:
-                        $query->where($param['column'], $param['operator'], $param['values']);
+                        $query->where($param['column'], $param['operator'], $param['value']);
                 }
             }
         }
@@ -154,7 +154,7 @@ trait SearchTrait
     private function checkValueIsNull(array $params)
     {
         foreach ($params as $key => $param) {
-            if ($param['values'] != '') {
+            if ($param['value'] != '') {
                 return false;
             }
         }
