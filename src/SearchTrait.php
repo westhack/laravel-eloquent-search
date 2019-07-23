@@ -60,7 +60,7 @@ trait SearchTrait
         if (is_array($params)) {
             foreach ($params as $key => $_param) {
                 $param = [];
-                if (is_array($_param)) {
+                if (is_array($_param) && array_has($_param, 'column') && array_has($_param, 'value')) {
                     $param['column']   = array_get($_param, 'column', $key);
                     $param['operator'] = array_get($_param, 'operator', '=');
                     $param['value']    = array_get($_param, 'value', null);
@@ -69,8 +69,16 @@ trait SearchTrait
                     if ($_param == null) {
                         continue;
                     }
-                    $param['column']   = $key;
-                    $param['operator'] = '=';
+
+                    if (stripos(':', $key) !== false) {
+                        $arr = explode(':', $key);
+                        $param['column'] = $arr[0];
+                        $param['operator'] = isset($arr[1]) ? $arr[0] : '=';
+                    } else {
+                        $param['column']   = $key;
+                        $param['operator'] = '=';
+                    }
+
                     $param['value']    = $_param;
                 }
 
