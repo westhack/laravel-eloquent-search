@@ -10,6 +10,14 @@ trait SortOrderTrait
 
     public $sortOrderDesc = 'descend';
 
+    public function getSortOrderAsc() {
+        return $this->sortOrderAsc;
+    }
+
+    public function getSortOrderDesc() {
+        return $this->sortOrderDesc;
+    }
+    
     /**
      * 排序
      *
@@ -22,7 +30,7 @@ trait SortOrderTrait
     {
         $sort = array_wrap($sort);
 
-        $sortable = $this->getSortable();
+        $sortable = $this->parseSortable();
         if (!empty($sort)) {
             $column = array_get($sort, 'column');
             if (array_get($sort, 'order')) {
@@ -36,7 +44,7 @@ trait SortOrderTrait
             }
         } else {
             $column = head(array_keys($sortable));
-            $order = $this->formatSort(array_get($sortable, $column, $this->sortOrderAsc));
+            $order = $this->formatSort(array_get($sortable, $column, $this->getSortOrderAsc()));
 
             $query->orderBy($column,  $order);
         }
@@ -46,16 +54,22 @@ trait SortOrderTrait
 
     public function getSortable()
     {
-        if (empty($this->sortable)) {
-            return [$this->getKeyName() => $this->sortOrderDesc];
+        return [
+        ];
+    }
+
+    public function parseSortable()
+    {
+        if (empty($this->getSortable())) {
+            return [$this->getKeyName() => $this->getSortOrderDesc()];
         }
 
         $sortable = [];
-        foreach ($this->sortable as $key => $value) {
+        foreach ($this->getSortable() as $key => $value) {
             if (is_int($key)) {
-                $sortable[$value] = $this->sortOrderDesc;
+                $sortable[$value] = $this->getSortOrderDesc();
             } else {
-                $sortable[$key] = ($value == $this->sortOrderAsc ? $this->sortOrderAsc : $this->sortOrderDesc);
+                $sortable[$key] = ($value == $this->getSortOrderAsc() ? $this->getSortOrderAsc() : $this->getSortOrderDesc());
             }
         }
 
@@ -66,13 +80,13 @@ trait SortOrderTrait
     {
         $sortable = [];
         if (is_string($column)) {
-            $sortable[$column] = ($order == $this->sortOrderAsc ? $this->sortOrderAsc : $this->sortOrderDesc);
+            $sortable[$column] = ($order == $this->getSortOrderAsc() ? $this->getSortOrderAsc() : $this->getSortOrderDesc());
         } else if(is_array($column)) {
             foreach ($column as $key => $value) {
                 if (is_int($key)) {
-                    $sortable[$value] = $this->sortOrderDesc;
+                    $sortable[$value] = $this->getSortOrderDesc();
                 } else {
-                    $sortable[$key] = ($value == $this->sortOrderAsc ? $this->sortOrderAsc : $this->sortOrderDesc);
+                    $sortable[$key] = ($value == $this->getSortOrderAsc() ? $this->getSortOrderAsc() : $this->getSortOrderDesc());
                 }
             }
         }
@@ -85,25 +99,25 @@ trait SortOrderTrait
     {
         $sortable = [];
         if (is_string($column)) {
-            $sortable[$column] = ($order == $this->sortOrderAsc ? $this->sortOrderAsc : $this->sortOrderDesc);
+            $sortable[$column] = ($order == $this->getSortOrderAsc() ? $this->getSortOrderAsc() : $this->getSortOrderDesc());
         } else if(is_array($column)) {
             foreach ($column as $key => $value) {
                 if (is_int($key)) {
-                    $sortable[$value] = $this->sortOrderDesc;
+                    $sortable[$value] = $this->getSortOrderDesc();
                 } else {
-                    $sortable[$key] = ($value == $this->sortOrderAsc ? $this->sortOrderAsc : $this->sortOrderDesc);
+                    $sortable[$key] = ($value == $this->getSortOrderAsc() ? $this->getSortOrderAsc() : $this->getSortOrderDesc());
                 }
             }
         }
 
-        $this->sortable = array_merge($this->sortable, $sortable);
+        $this->sortable = array_merge($this->getSortable(), $sortable);
 
         return $this;
     }
 
     private function formatSort($sort)
     {
-        if ($sort == $this->sortOrderAsc) {
+        if ($sort == $this->getSortOrderAsc()) {
             return 'asc';
         }
 

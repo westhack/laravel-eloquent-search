@@ -57,55 +57,68 @@ trait SearchTrait
      */
     public function scopeSearch($query, $params)
     {
-        if (is_array($params)) {
-            foreach ($params as $key => $_param) {
-                $param = [];
-                if (is_array($_param) && array_has($_param, 'column') && array_has($_param, 'value')) {
-                    $param['column']   = array_get($_param, 'column', $key);
-                    $param['operator'] = array_get($_param, 'operator', '=');
-                    $param['value']    = array_get($_param, 'value', null);
+        $searchable = $this->getSearchable();
 
-                } else {
-                    if ($_param == null) {
-                        continue;
-                    }
+        $new_params = [];
 
-                    if (stripos(':', $key) !== false) {
-                        $arr = explode(':', $key);
-                        $param['column'] = $arr[0];
-                        $param['operator'] = isset($arr[1]) ? $arr[0] : '=';
-                    } else {
-                        $param['column']   = $key;
-                        $param['operator'] = '=';
-                    }
+        foreach ($params as $key => $_param) {
+            $param = [];
+            if (is_array($_param)) {
+                $param['column'] = array_get($_param, 'column', $key);
+                $param['operator'] = array_get($_param, 'operator', '=');
+                $param['value'] = array_get($_param, 'value', null);
 
-                    $param['value']    = $_param;
-                }
-
-                if ($param['value'] == null) {
+            } else {
+                if ($_param == null) {
                     continue;
                 }
+                $param['column'] = $key;
+                $param['operator'] = '=';
+                $param['value'] = $_param;
+            }
+
+            if ($param['value'] == null) {
+                continue;
+            }
+
+            $new_params[$param['column']] = $param;
+        }
+
+        $params = [];
+        if ($searchable) {
+            foreach ($searchable as $search) {
+                if (isset($new_params[$search])) {
+                    $params[] = $new_params[$search];
+                }
+            }
+        } else {
+            $params = $new_params;
+            unset($new_params);
+        }
+
+        if (is_array($params)) {
+            foreach ($params as $key => $param) {
 
                 switch (strtolower($param['operator'])) {
                     case 'between':
                         $query->whereBetween($param['column'], $param['value']);
                         break;
-                    case 'not between':
+                    case 'not_between':
                         $query->whereNotBetween($param['column'], $param['value']);
                         break;
-                    case 'is null':
+                    case 'is_null':
                         $query->whereNull($param['column']);
                         break;
-                    case 'is not null':
+                    case 'is_not_null':
                         $query->whereNotNull($param['column']);
                         break;
-                    case 'like all':
+                    case 'like_all':
                         $query->whereLike($param['column'], $param['value']);
                         break;
-                    case 'begin with':
+                    case 'ilike':
                         $query->whereBeginsWith($param['column'], $param['value']);
                         break;
-                    case 'end with':
+                    case 'rlike':
                         $query->whereEndsWith($param['column'], $param['value']);
                         break;
                     case 'in':
@@ -168,5 +181,10 @@ trait SearchTrait
         }
 
         return true;
+    }
+
+    public function getSearchable()
+    {
+        return [];
     }
 }
